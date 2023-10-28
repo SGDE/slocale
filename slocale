@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 <lang> <program_name>"
+	exit 1
+fi
+
+language="$1"
+program_name="$2"
+
+mkdir -p "po/$language" "locale/$language/LC_MESSAGES"
+touch "po/$language"
+
+xgettext -o "po/$language.po" "$program_name.c" "$program_name-cr.c" "$program_name.h" \
+-k_ --package-name="$program_name" --package-version=0.1 \
+--copyright-holder=SGDE -j
+
+for po in po/*; do
+	lng=$(echo "$po" | cut -d/ -f2 | cut -d. -f1 )
+	msgfmt -o "locale/$lng/LC_MESSAGES/$program_name.mo" "$po"
+done
